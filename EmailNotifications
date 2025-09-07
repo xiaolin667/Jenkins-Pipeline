@@ -11,9 +11,39 @@ pipeline {
 
         stage('Unit and Integration Tests') {
             steps {
-                // Tool: JUnit for unit tests, TestNG for integration tests
-                echo 'Running unit tests using JUnit...'
-                echo 'Running integration tests using TestNG...'
+                script {
+                    try {
+                        // Tool: JUnit for unit tests
+                        echo 'Running unit tests using JUnit...'
+                        // Simulating unit tests
+                        sleep(1)
+
+                        // Tool: TestNG for integration tests
+                        echo 'Running integration tests using TestNG...'
+                        // Simulating integration tests
+                        sleep(1)
+
+                        // Notify success
+                        currentBuild.result = 'SUCCESS'
+                    } catch (Exception e) {
+                        // Notify failure
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        def emailSubject = "Unit and Integration Tests - ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                        def emailBody = "The Unit and Integration tests have completed with status: ${currentBuild.result}.\n\nCheck the logs:\n${env.BUILD_URL}console"
+                        emailext(
+                            to: "situ.xiaolin667@gmail.com",
+                            subject: emailSubject,
+                            body: emailBody,
+                            attachLog: true
+                        )
+                    }
+                }
             }
         }
 
@@ -26,8 +56,34 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                // Tool: OWASP ZAP
-                echo 'Performing security scan using OWASP ZAP...'
+                script {
+                    try {
+                        // Tool: OWASP ZAP
+                        echo 'Performing security scan using OWASP ZAP...'
+                        // Simulating a security scan
+                        sleep(1)
+
+                        // Notify success
+                        currentBuild.result = 'SUCCESS'
+                    } catch (Exception e) {
+                        // Notify failure
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        def emailSubject = "Security Scan - ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                        def emailBody = "The security scan has completed with status: ${currentBuild.result}.\n\nCheck the logs:\n${env.BUILD_URL}console"
+                        emailext(
+                            to: "situ.xiaolin667@gmail.com",
+                            subject: emailSubject,
+                            body: emailBody,
+                            attachLog: true
+                        )
+                    }
+                }
             }
         }
 
