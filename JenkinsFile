@@ -1,0 +1,85 @@
+pipeline {
+    agent any
+    triggers {
+        pollSCM('H/5 * * * *') // Polls every 5 minutes
+    }
+    
+    stages {
+        // Stage 1: Build
+        stage('Build') {
+            steps {
+                echo 'Building the code using Maven...'
+                sh 'mvn clean compile package -DskipTests'
+            }
+        }
+        
+        // Stage 2: Unit and Integration Tests
+        stage('Unit and Integration Tests') {
+            steps {
+                echo 'Running unit and integration tests with JUnit and TestNG...'
+                sh 'mvn test'
+            }
+        }
+        
+        // Stage 3: Code Analysis
+        stage('Code Analysis') {
+            steps {
+                echo 'Performing code analysis with SonarQube...'
+                sh 'mvn sonar:sonar -Dsonar.projectKey=my-project'
+            }
+        }
+        
+        // Stage 4: Security Scan
+        stage('Security Scan') {
+            steps {
+                echo 'Running security scan with OWASP Dependency Check...'
+                sh 'mvn org.owasp:dependency-check-maven:check'
+            }
+        }
+        
+        // Stage 5: Deploy to Staging
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to AWS EC2 staging environment...'
+                sh 'aws s3 cp target/my-app.jar s3://my-staging-bucket/'
+                sh 'aws ec2 run-instances --image-id ami-123456 --instance-type t2.micro --user-data file://deploy-script.sh'
+            }
+        }
+        
+        // Stage 6: Integration Tests on Staging
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'Running integration tests on staging with Selenium...'
+                sh 'mvn test -Dtest=StagingIntegrationTests -Dbase.url=http://staging.example.com'
+            }
+        }
+        
+        // Stage 7: Deploy to Production
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying to AWS EC2 production environment...'
+                sh 'aws s3 cp target/my-app.jar s3://my-production-bucket/'
+                sh 'aws ec2 run-instances --image-id ami-789012 --instance-type t2.large --user-data file://production-deploy.sh'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+            emailext (
+                subject: 'SUCCESS: Pipeline ${JOB_NAME} - ${BUILD_NUMBER}',
+                body: 'The pipeline completed successfully. Check details at: ${BUILD_URL}',
+                to: 'dev-team@example.com'
+            )
+        }
+        failure {
+            echo 'Pipeline execution failed!'
+            emailext (
+                subject: 'FAILED: Pipeline ${JOB_NAME} - ${BUILD_NUMBER}',
+                body: 'The pipeline failed. Check details at: ${BUILD_URL}',
+                to: 'dev-team@example.com'
+            )
+        }
+    }
+}
