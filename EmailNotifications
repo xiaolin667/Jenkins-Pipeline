@@ -12,6 +12,7 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps {
                 script {
+                    def testLogContent = ""
                     try {
                         // Tool: JUnit for unit tests, TestNG for integration tests
                         echo 'Running unit tests using JUnit...'
@@ -22,28 +23,38 @@ pipeline {
                         // Simulating integration tests
                         sleep(1)
 
-                        // Write test logs to file
-                        writeFile file: 'test-results.log', text: 'Unit and integration test logs here...\nTest execution completed successfully.'
+                        // Create test log content
+                        testLogContent = "Unit Tests: PASSED\nIntegration Tests: PASSED\nTotal Tests Executed: 50\nFailed: 0"
+                        writeFile file: 'test-results.log', text: testLogContent
 
                         // Notify success
                         currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
-                        // Write failure logs to file
-                        writeFile file: 'test-results.log', text: "Test execution failed with error: ${e.getMessage()}"
+                        // Create failure log content
+                        testLogContent = "Test Execution FAILED\nError: ${e.getMessage()}\nStack Trace: ${e.getStackTrace().join('\n')}"
+                        writeFile file: 'test-results.log', text: testLogContent
+                        
                         // Notify failure
                         currentBuild.result = 'FAILURE'
                         error("Tests failed: ${e.getMessage()}")
                     } finally {
-                        // Archive logs for email
+                        // Archive logs
                         archiveArtifacts artifacts: '**/*.log'
 
-                        // Send email notification with attachment
-                        emailext(
-                            to: 'situ.xiaolin667@gmail.com',
-                            subject: "Unit and Integration Tests - ${currentBuild.result}",
-                            body: "The unit and integration tests have finished with status: ${currentBuild.result}.\n\nPlease see the attached log file for details.",
-                            attachmentsPattern: '**/*.log'
-                        )
+                        // Read the log file content
+                        def logFile = readFile('test-results.log')
+                        
+                        // Send email notification with log content in body
+                        mail to: 'situ.xiaolin667@gmail.com',
+                             subject: "Unit and Integration Tests - ${currentBuild.result}",
+                             body: """
+The unit and integration tests have finished with status: ${currentBuild.result}
+
+=== TEST RESULTS LOG ===
+${logFile}
+
+Build URL: ${env.BUILD_URL}
+"""
                     }
                 }
             }
@@ -59,32 +70,45 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
+                    def securityLogContent = ""
                     try {
                         // Tool: OWASP ZAP
                         echo 'Performing security scan using OWASP ZAP...'
                         // Simulating a security scan
                         sleep(1)
-                        writeFile file: 'security-scan.log', text: 'Security scan logs here...\nVulnerabilities found: 0\nScan completed successfully.'
+                        
+                        // Create security log content
+                        securityLogContent = "Security Scan Results:\n- Vulnerabilities Found: 0\n- Warnings: 2\n- Scan Duration: 5 minutes\n- Status: COMPLETED_SUCCESSFULLY"
+                        writeFile file: 'security-scan.log', text: securityLogContent
 
                         // Notify success
                         currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
-                        // Write failure logs to file
-                        writeFile file: 'security-scan.log', text: "Security scan failed with error: ${e.getMessage()}"
+                        // Create failure log content
+                        securityLogContent = "Security Scan FAILED\nError: ${e.getMessage()}\nScan Status: ABORTED"
+                        writeFile file: 'security-scan.log', text: securityLogContent
+                        
                         // Notify failure
                         currentBuild.result = 'FAILURE'
                         error("Security scan failed: ${e.getMessage()}")
                     } finally {
-                        // Archive logs for email
+                        // Archive logs
                         archiveArtifacts artifacts: '**/*.log'
 
-                        // Send email notification with attachment
-                        emailext(
-                            to: 'situ.xiaolin667@gmail.com',
-                            subject: "Security Scan - ${currentBuild.result}",
-                            body: "The security scan has finished with status: ${currentBuild.result}.\n\nPlease see the attached log file for details.",
-                            attachmentsPattern: '**/*.log'
-                        )
+                        // Read the log file content
+                        def logFile = readFile('security-scan.log')
+                        
+                        // Send email notification with log content in body
+                        mail to: 'situ.xiaolin667@gmail.com',
+                             subject: "Security Scan - ${currentBuild.result}",
+                             body: """
+The security scan has finished with status: ${currentBuild.result}
+
+=== SECURITY SCAN LOG ===
+${logFile}
+
+Build URL: ${env.BUILD_URL}
+"""
                     }
                 }
             }
