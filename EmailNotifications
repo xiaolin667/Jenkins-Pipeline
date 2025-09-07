@@ -80,5 +80,13 @@ pipeline {
                 echo 'Deploying to production server on AWS EC2...'
             }
         }
+        stage ('Prompt check'){
+            steps {
+            mail to: 'situ.xiaolin667@gmail.com',
+                 cc : 'situsnow@gamil.com'
+                subject: "INPUT: Build ${env.JOB_NAME}", 
+                body: "test actual run"
+            }
+        }
     }
 }
