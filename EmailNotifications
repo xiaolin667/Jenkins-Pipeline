@@ -13,12 +13,11 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Tool: JUnit for unit tests
+                        // Tool: JUnit for unit tests, TestNG for integration tests
                         echo 'Running unit tests using JUnit...'
                         // Simulating unit tests
                         sleep(1)
 
-                        // Tool: TestNG for integration tests
                         echo 'Running integration tests using TestNG...'
                         // Simulating integration tests
                         sleep(1)
@@ -28,6 +27,11 @@ pipeline {
                     } catch (Exception e) {
                         // Notify failure
                         currentBuild.result = 'FAILURE'
+                    } finally {
+                        // Send email notification
+                        mail to: 'situ.xiaolin667@gmail.com',
+                             subject: "Unit and Integration Tests - ${currentBuild.result}",
+                             body: "The unit and integration tests have finished with status: ${currentBuild.result}."
                     }
                 }
             }
@@ -54,10 +58,14 @@ pipeline {
                     } catch (Exception e) {
                         // Notify failure
                         currentBuild.result = 'FAILURE'
+                    } finally {
+                        // Send email notification
+                        mail to: 'situ.xiaolin667@gmail.com',
+                             subject: "Security Scan - ${currentBuild.result}",
+                             body: "The security scan has finished with status: ${currentBuild.result}."
                     }
                 }
             }
-
         }
 
         stage('Deploy to Staging') {
@@ -78,14 +86,6 @@ pipeline {
             steps {
                 // Tool: AWS CLI for production deployment
                 echo 'Deploying to production server on AWS EC2...'
-            }
-        }
-        stage('Prompt check') {
-            steps {
-                mail to: 'situ.xiaolin667@gmail.com',
-                     cc: 'situsnow@gmail.com', // Fixed: Corrected missing 'l' in 'gmail.com'
-                     subject: 'Test actual run02', 
-                     body: 'Test actual run02'
             }
         }
     }
