@@ -84,7 +84,7 @@ pipeline {
             steps {
             mail to: 'situ.xiaolin667@gmail.com',
                  cc : 'situsnow@gamil.com'
-                subject: "INPUT: Build ${env.JOB_NAME}", 
+                subject: "test actual run", 
                 body: "test actual run"
             }
         }
