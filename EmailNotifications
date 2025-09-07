@@ -80,12 +80,12 @@ pipeline {
                 echo 'Deploying to production server on AWS EC2...'
             }
         }
-        stage ('Prompt check'){
+        stage('Prompt check') {
             steps {
-            mail to: 'situ.xiaolin667@gmail.com',
-                 cc : 'situsnow@gamil.com'
-                subject: 'test actual run', 
-                body: 'test actual run'
+                mail to: 'situ.xiaolin667@gmail.com',
+                     cc: 'situsnow@gmail.com', // Fixed: Corrected missing 'l' in 'gmail.com'
+                     subject: 'Test actual run', 
+                     body: 'Test actual run'
             }
         }
     }
