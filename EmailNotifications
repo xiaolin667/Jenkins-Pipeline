@@ -6,8 +6,6 @@ pipeline {
             steps {
                 // Tool: Maven
                 echo 'Building the code using Maven...'
-                // Simulate log generation
-                writeFile file: 'build.log', text: 'Build logs here...'
             }
         }
 
@@ -19,25 +17,33 @@ pipeline {
                         echo 'Running unit tests using JUnit...'
                         // Simulating unit tests
                         sleep(1)
-                        writeFile file: 'unit-tests.log', text: 'Unit test logs here...'
 
                         echo 'Running integration tests using TestNG...'
                         // Simulating integration tests
                         sleep(1)
-                        writeFile file: 'integration-tests.log', text: 'Integration test logs here...'
 
+                        // Write test logs to file
+                        writeFile file: 'test-results.log', text: 'Unit and integration test logs here...\nTest execution completed successfully.'
+
+                        // Notify success
+                        currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
+                        // Write failure logs to file
+                        writeFile file: 'test-results.log', text: "Test execution failed with error: ${e.getMessage()}"
                         // Notify failure
                         currentBuild.result = 'FAILURE'
+                        error("Tests failed: ${e.getMessage()}")
                     } finally {
                         // Archive logs for email
-                        archiveArtifacts artifacts: 'unit-tests.log'
+                        archiveArtifacts artifacts: '**/*.log'
 
-                        // Send email notification
-                        mail to: 'situ.xiaolin667@gmail.com',
-                             subject: "Unit and Integration Tests - ${currentBuild.result}",
-                             body: "The unit and integration tests have finished with status: ${currentBuild.result}.",
-                             attachmentsPattern: 'unit-tests.log'
+                        // Send email notification with attachment
+                        emailext(
+                            to: 'situ.xiaolin667@gmail.com',
+                            subject: "Unit and Integration Tests - ${currentBuild.result}",
+                            body: "The unit and integration tests have finished with status: ${currentBuild.result}.\n\nPlease see the attached log file for details.",
+                            attachmentsPattern: '**/*.log'
+                        )
                     }
                 }
             }
@@ -47,8 +53,6 @@ pipeline {
             steps {
                 // Tool: SonarQube
                 echo 'Analyzing code with SonarQube...'
-                // Simulate log generation
-                writeFile file: 'code-analysis.log', text: 'Code analysis logs here...'
             }
         }
 
@@ -60,22 +64,27 @@ pipeline {
                         echo 'Performing security scan using OWASP ZAP...'
                         // Simulating a security scan
                         sleep(1)
-                        writeFile file: 'security-scan.log', text: 'Security scan logs here...'
+                        writeFile file: 'security-scan.log', text: 'Security scan logs here...\nVulnerabilities found: 0\nScan completed successfully.'
 
                         // Notify success
                         currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
+                        // Write failure logs to file
+                        writeFile file: 'security-scan.log', text: "Security scan failed with error: ${e.getMessage()}"
                         // Notify failure
                         currentBuild.result = 'FAILURE'
+                        error("Security scan failed: ${e.getMessage()}")
                     } finally {
                         // Archive logs for email
                         archiveArtifacts artifacts: '**/*.log'
 
-                        // Send email notification
-                        mail to: 'situ.xiaolin667@gmail.com',
-                             subject: "Security Scan - ${currentBuild.result}",
-                             body: "The security scan has finished with status: ${currentBuild.result}.",
-                             attachmentsPattern: '**/*.log'
+                        // Send email notification with attachment
+                        emailext(
+                            to: 'situ.xiaolin667@gmail.com',
+                            subject: "Security Scan - ${currentBuild.result}",
+                            body: "The security scan has finished with status: ${currentBuild.result}.\n\nPlease see the attached log file for details.",
+                            attachmentsPattern: '**/*.log'
+                        )
                     }
                 }
             }
@@ -85,8 +94,6 @@ pipeline {
             steps {
                 // Tool: AWS CLI for deployment
                 echo 'Deploying to staging server on AWS EC2...'
-                // Simulate log generation
-                writeFile file: 'deployment-staging.log', text: 'Staging deployment logs here...'
             }
         }
 
@@ -94,8 +101,6 @@ pipeline {
             steps {
                 // Tool: Selenium for integration testing
                 echo 'Running integration tests on the staging environment using Selenium...'
-                // Simulate log generation
-                writeFile file: 'integration-tests-staging.log', text: 'Staging integration test logs here...'
             }
         }
 
@@ -103,8 +108,6 @@ pipeline {
             steps {
                 // Tool: AWS CLI for production deployment
                 echo 'Deploying to production server on AWS EC2...'
-                // Simulate log generation
-                writeFile file: 'deployment-production.log', text: 'Production deployment logs here...'
             }
         }
     }
