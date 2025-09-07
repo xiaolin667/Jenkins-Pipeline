@@ -52,6 +52,8 @@ pipeline {
                         echo 'Performing security scan using OWASP ZAP...'
                         // Simulating a security scan
                         sleep(1)
+                        writeFile file: 'security-scan.log', text: 'Security scan logs here...'
+
 
                         // Notify success
                         currentBuild.result = 'SUCCESS'
@@ -59,6 +61,9 @@ pipeline {
                         // Notify failure
                         currentBuild.result = 'FAILURE'
                     } finally {
+                        // Archive logs for email
+                        archiveArtifacts artifacts: '**/*.log'
+
                         // Send email notification
                         mail to: 'situ.xiaolin667@gmail.com',
                              subject: "Security Scan - ${currentBuild.result}",
