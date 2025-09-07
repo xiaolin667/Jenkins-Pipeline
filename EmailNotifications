@@ -57,20 +57,7 @@ pipeline {
                     }
                 }
             }
-            post {
-                always {
-                    script {
-                        def emailSubject = "Security Scan - ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-                        def emailBody = "The security scan has completed with status: ${currentBuild.result}.\n\nCheck the logs:\n${env.BUILD_URL}console"
-                        emailext(
-                            to: "situ.xiaolin667@gmail.com, divyaparadkar@gmail.com",
-                            subject: emailSubject,
-                            body: emailBody,
-                            attachLog: true
-                        )
-                    }
-                }
-            }
+
         }
 
         stage('Deploy to Staging') {
