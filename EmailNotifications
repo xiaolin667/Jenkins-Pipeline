@@ -62,7 +62,8 @@ pipeline {
                         // Send email notification
                         mail to: 'situ.xiaolin667@gmail.com',
                              subject: "Security Scan - ${currentBuild.result}",
-                             body: "The security scan has finished with status: ${currentBuild.result}."
+                             body: "The security scan has finished with status: ${currentBuild.result}.",
+                             attachmentsPattern: '**/*.log'
                     }
                 }
             }
