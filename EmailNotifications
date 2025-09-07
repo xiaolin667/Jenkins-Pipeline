@@ -6,6 +6,8 @@ pipeline {
             steps {
                 // Tool: Maven
                 echo 'Building the code using Maven...'
+                // Simulate log generation
+                writeFile file: 'build.log', text: 'Build logs here...'
             }
         }
 
@@ -17,21 +19,25 @@ pipeline {
                         echo 'Running unit tests using JUnit...'
                         // Simulating unit tests
                         sleep(1)
+                        writeFile file: 'unit-tests.log', text: 'Unit test logs here...'
 
                         echo 'Running integration tests using TestNG...'
                         // Simulating integration tests
                         sleep(1)
+                        writeFile file: 'integration-tests.log', text: 'Integration test logs here...'
 
-                        // Notify success
-                        currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
                         // Notify failure
                         currentBuild.result = 'FAILURE'
                     } finally {
+                        // Archive logs for email
+                        archiveArtifacts artifacts: 'unit-tests.log'
+
                         // Send email notification
                         mail to: 'situ.xiaolin667@gmail.com',
                              subject: "Unit and Integration Tests - ${currentBuild.result}",
-                             body: "The unit and integration tests have finished with status: ${currentBuild.result}."
+                             body: "The unit and integration tests have finished with status: ${currentBuild.result}.",
+                             attachmentsPattern: 'unit-tests.log'
                     }
                 }
             }
@@ -41,6 +47,8 @@ pipeline {
             steps {
                 // Tool: SonarQube
                 echo 'Analyzing code with SonarQube...'
+                // Simulate log generation
+                writeFile file: 'code-analysis.log', text: 'Code analysis logs here...'
             }
         }
 
@@ -53,7 +61,6 @@ pipeline {
                         // Simulating a security scan
                         sleep(1)
                         writeFile file: 'security-scan.log', text: 'Security scan logs here...'
-
 
                         // Notify success
                         currentBuild.result = 'SUCCESS'
@@ -78,6 +85,8 @@ pipeline {
             steps {
                 // Tool: AWS CLI for deployment
                 echo 'Deploying to staging server on AWS EC2...'
+                // Simulate log generation
+                writeFile file: 'deployment-staging.log', text: 'Staging deployment logs here...'
             }
         }
 
@@ -85,6 +94,8 @@ pipeline {
             steps {
                 // Tool: Selenium for integration testing
                 echo 'Running integration tests on the staging environment using Selenium...'
+                // Simulate log generation
+                writeFile file: 'integration-tests-staging.log', text: 'Staging integration test logs here...'
             }
         }
 
@@ -92,6 +103,8 @@ pipeline {
             steps {
                 // Tool: AWS CLI for production deployment
                 echo 'Deploying to production server on AWS EC2...'
+                // Simulate log generation
+                writeFile file: 'deployment-production.log', text: 'Production deployment logs here...'
             }
         }
     }
