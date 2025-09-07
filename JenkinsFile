@@ -1,46 +1,54 @@
 pipeline {
     agent any
-    environment {
-        DIRECTORY_PATH = '/Users/xiaolinsitu'
-        TESTING_ENVIRONMENT = 'Testing Environment'
-        PRODUCTION_ENVIRONMENT = 'XiaolinSitu'
-    }
+
     stages {
         stage('Build') {
             steps {
-                echo "Fetch the source code from the directory path specified by the environment variable: ${env.DIRECTORY_PATH}"
-                echo "Compile the code and generate any necessary artefacts"
+                // Tool: Maven
+                echo 'Building the code using Maven...'
             }
         }
-        stage('Test') {
+
+        stage('Unit and Integration Tests') {
             steps {
-                echo "Unit tests"
-                echo "Integration tests"
+                // Tool: JUnit for unit tests, TestNG for integration tests
+                echo 'Running unit tests using JUnit...'
+                echo 'Running integration tests using TestNG...'
             }
         }
-        stage('Code Quality Check') {
+
+        stage('Code Analysis') {
             steps {
-                echo "Check the quality of the code"
+                // Tool: SonarQube
+                echo 'Analyzing code with SonarQube...'
             }
         }
-        stage('Deploy') {
+
+        stage('Security Scan') {
             steps {
-                echo "Deploy the application to a testing environment specified by the environment variable: ${env.TESTING_ENVIRONMENT}"
+                // Tool: OWASP ZAP
+                echo 'Performing security scan using OWASP ZAP...'
             }
         }
-        stage('Approval') {
+
+        stage('Deploy to Staging') {
             steps {
-                sleep 10
+                // Tool: AWS CLI for deployment
+                echo 'Deploying to staging server on AWS EC2...'
             }
         }
+
+        stage('Integration Tests on Staging') {
+            steps {
+                // Tool: Selenium for integration testing
+                echo 'Running integration tests on the staging environment using Selenium...'
+            }
+        }
+
         stage('Deploy to Production') {
             steps {
-                echo "Deploying the code to the production environment: ${env.PRODUCTION_ENVIRONMENT}"
-            }
-        }
-        stage('Completing..') {
-            steps {
-                echo "Completed."
+                // Tool: AWS CLI for production deployment
+                echo 'Deploying to production server on AWS EC2...'
             }
         }
     }
