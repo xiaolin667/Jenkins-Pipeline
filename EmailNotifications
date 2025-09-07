@@ -84,8 +84,8 @@ pipeline {
             steps {
             mail to: 'situ.xiaolin667@gmail.com',
                  cc : 'situsnow@gamil.com'
-                subject: "test actual run", 
-                body: "test actual run"
+                subject: 'test actual run', 
+                body: 'test actual run'
             }
         }
     }
