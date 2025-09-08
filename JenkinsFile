@@ -48,7 +48,7 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 // Tool: AWS CLI for production deployment
-                echo 'Deploying to production server on AWS EC2...'
+                echo 'Deploying to production server on AWS EC...'
             }
         }
     }
