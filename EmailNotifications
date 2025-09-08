@@ -15,10 +15,10 @@ pipeline {
                     def testLogContent = ""
                     try {
                         echo 'Running unit tests using JUnit...'
-                        sleep(1)
+                        sleep(1) // Simulate unit tests
 
                         echo 'Running integration tests using TestNG...'
-                        sleep(1)
+                        sleep(1) // Simulate integration tests
 
                         testLogContent = "Unit Tests: PASSED\nIntegration Tests: PASSED\nTotal Tests Executed: 50\nFailed: 0"
                         writeFile file: 'test-results.log', text: testLogContent
@@ -34,16 +34,18 @@ pipeline {
                         archiveArtifacts artifacts: '**/*.log'
 
                         // Send email notification with log attachment
-                        mail to: 'situ.xiaolin667@gmail.com',
-                             subject: "Unit and Integration Tests - ${currentBuild.result}",
-                             body: """
+                        emailext(
+                            to: 'situ.xiaolin667@gmail.com',
+                            subject: "Unit and Integration Tests - ${currentBuild.result}",
+                            body: """
 The unit and integration tests have finished with status: ${currentBuild.result}
 
 Please find the attached test results log.
 
 Build URL: ${env.BUILD_URL}
 """,
-                             attachments: 'test-results.log'
+                            attachments: 'test-results.log'
+                        )
                     }
                 }
             }
@@ -61,7 +63,7 @@ Build URL: ${env.BUILD_URL}
                     def securityLogContent = ""
                     try {
                         echo 'Performing security scan using OWASP ZAP...'
-                        sleep(1)
+                        sleep(1) // Simulate security scan
                         
                         securityLogContent = "Security Scan Results:\n- Vulnerabilities Found: 0\n- Warnings: 2\n- Scan Duration: 5 minutes\n- Status: COMPLETED_SUCCESSFULLY"
                         writeFile file: 'security-scan.log', text: securityLogContent
@@ -77,16 +79,18 @@ Build URL: ${env.BUILD_URL}
                         archiveArtifacts artifacts: '**/*.log'
 
                         // Send email notification with log attachment
-                        mail to: 'situ.xiaolin667@gmail.com',
-                             subject: "Security Scan - ${currentBuild.result}",
-                             body: """
+                        emailext(
+                            to: 'situ.xiaolin667@gmail.com',
+                            subject: "Security Scan - ${currentBuild.result}",
+                            body: """
 The security scan has finished with status: ${currentBuild.result}
 
 Please find the attached security scan log.
 
 Build URL: ${env.BUILD_URL}
 """,
-                             attachments: 'security-scan.log'
+                            attachments: 'security-scan.log'
+                        )
                     }
                 }
             }
