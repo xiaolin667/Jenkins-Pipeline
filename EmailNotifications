@@ -32,16 +32,15 @@ pipeline {
                     } finally {
                         archiveArtifacts artifacts: '**/*.log'
 
-                        def logFile = readFile('test-results.log')
-                        
-                        emailext subject: "Unit and Integration Tests - ${currentBuild.result}",
+                        // Send email notification with log file as attachment
+                        emailext to: 'situ.xiaolin667@gmail.com',
+                                 subject: "Unit and Integration Tests - ${currentBuild.result}",
                                  body: """
 The unit and integration tests have finished with status: ${currentBuild.result}
 
 Build URL: ${env.BUILD_URL}
 """,
-                                 to: 'situ.xiaolin667@gmail.com',
-                                 attachmentsPattern: 'test-results.log'
+                                 attachmentsPattern: 'test-results.log'                
                     }
                 }
             }
@@ -74,15 +73,14 @@ Build URL: ${env.BUILD_URL}
                     } finally {
                         archiveArtifacts artifacts: '**/*.log'
 
-                        def logFile = readFile('security-scan.log')
-                        
-                        emailext subject: "Security Scan - ${currentBuild.result}",
+                        // Send email notification with log file as attachment
+                        emailext to: 'situ.xiaolin667@gmail.com',
+                                 subject: "Security Scan - ${currentBuild.result}",
                                  body: """
 The security scan has finished with status: ${currentBuild.result}
 
 Build URL: ${env.BUILD_URL}
 """,
-                                 to: 'situ.xiaolin667@gmail.com',
                                  attachmentsPattern: 'security-scan.log'
                     }
                 }
