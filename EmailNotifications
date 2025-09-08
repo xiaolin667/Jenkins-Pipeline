@@ -2,8 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('Test Email') {
+        stage('Build') {
             steps {
-                script {
-                    emailext subject: "Test Email",
-                             body: """
+                echo 'Build steps here...'
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                def logFileName = "${env.BUILD_TAG}-log.txt"
+                def logFilePath = "${env.WORKSPACE}/${logFileName}"
+                
+                // Write the log to a file
+                writeFile file: logFileName, text: currentBuild.rawBuild.log
+
+                // Email the log file
+                emailext (
+                    to: 'your_email@example.com',
+                    subject: "Build Log for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: 'Please find the build log attached.',
+                    attachmentsPattern: logFilePath
+                )
+            }
+        }
+    }
+}
