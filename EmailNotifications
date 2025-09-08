@@ -19,11 +19,11 @@ pipeline {
                 writeFile file: logFileName, text: currentBuild.rawBuild.log
 
                 // Email the log file
-                emailext (
+                emailext attachLog: true (
                     to: 'situ.xiaolin667@gmail.com',
                     subject: "Build Log for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: 'Please find the build log attached.',
-                    attachmentsPattern: logFilePath
+                    body: 'Please find the build log attached.'
+                    // attachmentsPattern: logFilePath
                 )
             }
         }
