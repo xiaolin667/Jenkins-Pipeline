@@ -4,29 +4,81 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Build steps here...'
+                echo 'Building the code using Maven...'
+            }
+        }
+
+        stage('Unit and Integration Tests') {
+            steps {
+                echo 'Running unit tests using JUnit...'
+                echo 'Running integration tests using TestNG...'
+            }
+            post {
+                success {
+                    sendEmailNotification('Unit and Integration Tests', 'SUCCESS')
+                }
+                failure {
+                    sendEmailNotification('Unit and Integration Tests', 'FAILURE')
+                }
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                echo 'Analyzing code with SonarQube...'
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                echo 'Performing security scan using OWASP ZAP...'
+            }
+            post {
+                success {
+                    sendEmailNotification('Security Scan', 'SUCCESS')
+                }
+                failure {
+                    sendEmailNotification('Security Scan', 'FAILURE')
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to staging server on AWS EC2...'
+            }
+        }
+
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'Running integration tests on the staging environment using Selenium...'
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying to production server on AWS EC2...'
             }
         }
     }
 
-    post {
-        always {
-            script {
-                def logFileName = "${env.BUILD_TAG}-log.txt"
-                def logFilePath = "${env.WORKSPACE}/${logFileName}"
-                
-                // Write the log to a file
-                writeFile file: logFileName, text: currentBuild.rawBuild.log
+    // Define the email notification method
+    def sendEmailNotification(stageName, status) {
+        script {
+            def logFileName = "${env.BUILD_TAG}-${stageName}-log.txt"
+            def logFilePath = "${env.WORKSPACE}/${logFileName}"
+            
+            // Write the log to a file
+            writeFile file: logFileName, text: currentBuild.rawBuild.log
 
-                // Email the log file
-                emailext (
-                    attachLog: true,
-                    to: 'situ.xiaolin667@gmail.com',
-                    subject: "test emailext", //Build Log for ${env.JOB_NAME} #${env.BUILD_NUMBER}
-                    body: 'Please find the build log attached.'
-                    // attachmentsPattern: logFilePath
-                )
-            }
+            // Email the log file
+            emailext (
+                attachLog: true,
+                to: 'situ.xiaolin667@gmail.com',
+                subject: "${stageName} Status: ${status} for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "The ${stageName} stage completed with status: ${status}. Please find the log attached."
+                // attachmentsPattern: logFilePath
+            )
         }
     }
 }
