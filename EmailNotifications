@@ -14,47 +14,36 @@ pipeline {
                 script {
                     def testLogContent = ""
                     try {
-                        // Tool: JUnit for unit tests, TestNG for integration tests
                         echo 'Running unit tests using JUnit...'
-                        // Simulating unit tests
                         sleep(1)
 
                         echo 'Running integration tests using TestNG...'
-                        // Simulating integration tests
                         sleep(1)
 
-                        // Create test log content
                         testLogContent = "Unit Tests: PASSED\nIntegration Tests: PASSED\nTotal Tests Executed: 50\nFailed: 0"
                         writeFile file: 'test-results.log', text: testLogContent
 
-                        // Notify success
                         currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
-                        // Create failure log content
                         testLogContent = "Test Execution FAILED\nError: ${e.getMessage()}\nStack Trace: ${e.getStackTrace().join('\n')}"
                         writeFile file: 'test-results.log', text: testLogContent
                         
-                        // Notify failure
                         currentBuild.result = 'FAILURE'
                         error("Tests failed: ${e.getMessage()}")
                     } finally {
-                        // Archive logs
                         archiveArtifacts artifacts: '**/*.log'
 
-                        // Read the log file content
-                        def logFile = readFile('test-results.log')
-                        
-                        // Send email notification with log content in body
+                        // Send email notification with log attachment
                         mail to: 'situ.xiaolin667@gmail.com',
                              subject: "Unit and Integration Tests - ${currentBuild.result}",
                              body: """
 The unit and integration tests have finished with status: ${currentBuild.result}
 
-=== TEST RESULTS LOG ===
-${logFile}
+Please find the attached test results log.
 
 Build URL: ${env.BUILD_URL}
-"""
+""",
+                             attachments: 'test-results.log'
                     }
                 }
             }
@@ -62,7 +51,6 @@ Build URL: ${env.BUILD_URL}
 
         stage('Code Analysis') {
             steps {
-                // Tool: SonarQube
                 echo 'Analyzing code with SonarQube...'
             }
         }
@@ -72,43 +60,33 @@ Build URL: ${env.BUILD_URL}
                 script {
                     def securityLogContent = ""
                     try {
-                        // Tool: OWASP ZAP
                         echo 'Performing security scan using OWASP ZAP...'
-                        // Simulating a security scan
                         sleep(1)
                         
-                        // Create security log content
                         securityLogContent = "Security Scan Results:\n- Vulnerabilities Found: 0\n- Warnings: 2\n- Scan Duration: 5 minutes\n- Status: COMPLETED_SUCCESSFULLY"
                         writeFile file: 'security-scan.log', text: securityLogContent
 
-                        // Notify success
                         currentBuild.result = 'SUCCESS'
                     } catch (Exception e) {
-                        // Create failure log content
                         securityLogContent = "Security Scan FAILED\nError: ${e.getMessage()}\nScan Status: ABORTED"
                         writeFile file: 'security-scan.log', text: securityLogContent
                         
-                        // Notify failure
                         currentBuild.result = 'FAILURE'
                         error("Security scan failed: ${e.getMessage()}")
                     } finally {
-                        // Archive logs
                         archiveArtifacts artifacts: '**/*.log'
 
-                        // Read the log file content
-                        def logFile = readFile('security-scan.log')
-                        
-                        // Send email notification with log content in body
+                        // Send email notification with log attachment
                         mail to: 'situ.xiaolin667@gmail.com',
                              subject: "Security Scan - ${currentBuild.result}",
                              body: """
 The security scan has finished with status: ${currentBuild.result}
 
-=== SECURITY SCAN LOG ===
-${logFile}
+Please find the attached security scan log.
 
 Build URL: ${env.BUILD_URL}
-"""
+""",
+                             attachments: 'security-scan.log'
                     }
                 }
             }
@@ -116,21 +94,18 @@ Build URL: ${env.BUILD_URL}
 
         stage('Deploy to Staging') {
             steps {
-                // Tool: AWS CLI for deployment
                 echo 'Deploying to staging server on AWS EC2...'
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
-                // Tool: Selenium for integration testing
                 echo 'Running integration tests on the staging environment using Selenium...'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                // Tool: AWS CLI for production deployment
                 echo 'Deploying to production server on AWS EC2...'
             }
         }
