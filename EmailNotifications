@@ -20,7 +20,7 @@ pipeline {
 
                 // Email the log file
                 emailext (
-                    to: 'your_email@example.com',
+                    to: 'situ.xiaolin667@gmail.com',
                     subject: "Build Log for ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     body: 'Please find the build log attached.',
                     attachmentsPattern: logFilePath
